@@ -1,6 +1,25 @@
 // Import Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, setDoc } 
+  from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const db = getFirestore(app);
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const uid = user.uid;
+
+    await setDoc(doc(db, "players", uid), {
+      nickname: "Player_" + uid.slice(0,5),
+      score: 0,
+      isPaid: false
+    }, { merge: true });
+
+    console.log("Player added to Firestore!");
+  }
+});
+
 
 // Your Firebase config (replace with your own from Firebase Console)
 const firebaseConfig = {
