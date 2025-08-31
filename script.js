@@ -2,24 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, setDoc } 
-  from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-const db = getFirestore(app);
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    const uid = user.uid;
-
-    await setDoc(doc(db, "players", uid), {
-      nickname: "Player_" + uid.slice(0,5),
-      score: 0,
-      isPaid: false
-    }, { merge: true });
-
-    console.log("Player added to Firestore!");
-  }
-});
-
+  from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Your Firebase config (replace with your own from Firebase Console)
 const firebaseConfig = {
@@ -31,9 +14,10 @@ const firebaseConfig = {
   appId: "1:105402079758:web:3953e2c16abb26c5e93a5f"
 };
 
-// Initialize Firebase
+// ✅ Initialize Firebase FIRST
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Sign in anonymously
 signInAnonymously(auth)
@@ -45,8 +29,16 @@ signInAnonymously(auth)
   });
 
 // Detect when user is signed in
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    console.log("User ID:", user.uid);
+    const uid = user.uid;
+
+    await setDoc(doc(db, "players", uid), {
+      nickname: "Player_" + uid.slice(0,5),
+      score: 0,
+      isPaid: false
+    }, { merge: true });
+
+    console.log("Player added to Firestore!");
   }
 });
